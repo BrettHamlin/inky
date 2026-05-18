@@ -43,7 +43,8 @@ function NotesApp() {
     return filterNotes(notes, { activeView, selectedTag, searchQuery });
   }, [notes, activeView, selectedTag, searchQuery]);
 
-  const effectiveSelectedNoteId = selectedNoteId ?? filteredNotes[0]?.id ?? null;
+  const effectiveSelectedNoteId =
+    selectedNoteId ?? filteredNotes[0]?.id ?? null;
 
   const selectedNote = useMemo(() => {
     if (isCreating) return null;
@@ -145,7 +146,19 @@ function NotesApp() {
         mode={mobileSidebarMode}
       />
 
-      {/* Mobile Note List (shown when no editor is open) */}
+      {/* Desktop Note List */}
+      <div className="hidden xl:block">
+        <NoteList
+          notes={filteredNotes}
+          selectedNoteId={effectiveSelectedNoteId}
+          onSelectNote={handleSelectNote}
+          onCreateNew={handleCreateNew}
+          searchQuery={searchQuery}
+          tagColors={tagColors}
+        />
+      </div>
+
+      {/* Mobile/Tablet Note List (shown when no editor is open) */}
       <div
         className={`xl:hidden flex-col flex-1 min-w-0 ${
           showEditor ? "hidden" : "flex"
@@ -294,16 +307,6 @@ function NotesApp() {
         </div>
 
         <div className="flex flex-1 overflow-hidden pb-12 md:pb-14 xl:pb-0">
-          <div className="hidden xl:block">
-            <NoteList
-          notes={filteredNotes}
-          selectedNoteId={effectiveSelectedNoteId}
-              onSelectNote={handleSelectNote}
-              onCreateNew={handleCreateNew}
-              searchQuery={searchQuery}
-              tagColors={tagColors}
-            />
-          </div>
           {showEditor ? (
             <NoteEditor
               key={
