@@ -21,13 +21,19 @@ import {
   deleteNoteById,
   removeTag,
   toggleArchiveById,
+  togglePinById,
   updateNoteById,
 } from "@/lib/note-state";
 
 function loadNotes(): Note[] {
   try {
     const stored = localStorage.getItem("inky-notes");
-    if (stored) return JSON.parse(stored);
+    if (stored) {
+      return (JSON.parse(stored) as Note[]).map((note) => ({
+        ...note,
+        pinned: note.pinned ?? false,
+      }));
+    }
   } catch {
     return [];
   }
@@ -75,7 +81,7 @@ function saveTagColors(tagColors: Record<string, ColorTheme>) {
   localStorage.setItem("inky-tag-colors", JSON.stringify(tagColors));
 }
 
-interface NotesContextValue {
+export interface NotesContextValue {
   notes: Note[];
   tags: string[];
   tagColors: Record<string, ColorTheme>;
@@ -83,6 +89,7 @@ interface NotesContextValue {
   updateNote: (id: string, data: NoteUpdateData) => void;
   deleteNote: (id: string) => void;
   toggleArchive: (id: string) => void;
+  togglePin: (id: string) => void;
   createTag: (tag: string, color?: ColorTheme) => boolean;
   deleteTag: (tag: string) => void;
 }
@@ -138,6 +145,10 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const togglePin = useCallback((id: string) => {
+    setNotes((prev) => togglePinById(prev, id, new Date().toISOString()));
+  }, []);
+
   const createTag = useCallback(
     (tag: string, color: ColorTheme = "blue") => {
       const next = addTag(tags, tagColors, tag, color);
@@ -167,6 +178,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       updateNote,
       deleteNote,
       toggleArchive,
+      togglePin,
       createTag,
       deleteTag,
     }),
@@ -178,6 +190,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
       updateNote,
       deleteNote,
       toggleArchive,
+      togglePin,
       createTag,
       deleteTag,
     ],

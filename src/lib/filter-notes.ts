@@ -40,5 +40,8 @@ export function filterNotes(
     );
   }
 
-  return result;
+  return [...result].sort((a, b) => {
+    if (a.pinned === b.pinned) return 0;
+    return a.pinned ? -1 : 1;
+  });
 }

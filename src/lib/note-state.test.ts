@@ -5,6 +5,7 @@ import {
   deleteNoteById,
   removeTag,
   toggleArchiveById,
+  togglePinById,
   updateNoteById,
 } from "./note-state.ts";
 import type { ColorTheme, Note } from "@/types";
@@ -19,6 +20,7 @@ function note(overrides: Partial<Note> = {}): Note {
     content: "Body",
     tags: ["General"],
     archived: false,
+    pinned: false,
     createdAt: timestamp,
     updatedAt: timestamp,
     ...overrides,
@@ -26,6 +28,22 @@ function note(overrides: Partial<Note> = {}): Note {
 }
 
 describe("note state helpers", () => {
+  //harness:criterion=c-note-fixture-includes-pinned-false
+  it("creates fixture notes with pinned defaulted to false", () => {
+    expect(note().pinned).toBe(false);
+  });
+
+  //harness:criterion=c-create-note-pinned-defaults-false
+  it("defaults new notes to unpinned", () => {
+    expect(
+      createNoteRecord(
+        { title: "Test", content: "", tags: [] },
+        "note-1",
+        timestamp,
+      ).pinned,
+    ).toBe(false);
+  });
+
   it("creates a new active note with matching created and updated timestamps", () => {
     expect(
       createNoteRecord(
@@ -39,6 +57,7 @@ describe("note state helpers", () => {
       content: "<p>Hello</p>",
       tags: ["Dev"],
       archived: false,
+      pinned: false,
       createdAt: timestamp,
       updatedAt: timestamp,
     });
@@ -72,6 +91,58 @@ describe("note state helpers", () => {
         laterTimestamp,
       ),
     ).toEqual([note({ archived: false, updatedAt: laterTimestamp })]);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-pins-unpinned-note
+  it("pins an unpinned note and refreshes its updated timestamp", () => {
+    const notes = [note(), note({ id: "2", title: "Other" })];
+
+    const result = togglePinById(notes, "1", "ts-123");
+
+    expect(result.find((item) => item.id === "1")).toMatchObject({
+      pinned: true,
+      updatedAt: "ts-123",
+    });
+    expect(result.find((item) => item.id === "2")).toEqual(notes[1]);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-unpins-pinned-note
+  it("unpins a pinned note and refreshes its updated timestamp", () => {
+    const notes = [note({ pinned: true })];
+
+    expect(togglePinById(notes, "1", "ts-456")[0]).toMatchObject({
+      pinned: false,
+      updatedAt: "ts-456",
+    });
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-does-not-mutate-input
+  it("does not mutate the input array or note objects when toggling pinned state", () => {
+    const notes = [
+      note(),
+      note({ id: "2", title: "Second", pinned: true }),
+      note({ id: "3", title: "Third" }),
+    ];
+    const snapshots = structuredClone(notes);
+
+    const result = togglePinById(notes, "2", laterTimestamp);
+
+    expect(result).not.toBe(notes);
+    expect(notes).toEqual(snapshots);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-unaffected-notes-unchanged
+  it("leaves non-target notes unchanged by value when toggling pinned state", () => {
+    const notes = [
+      note({ id: "1", title: "First" }),
+      note({ id: "2", title: "Second" }),
+      note({ id: "3", title: "Third", pinned: true }),
+    ];
+
+    const result = togglePinById(notes, "2", laterTimestamp);
+
+    expect(result[0]).toEqual(notes[0]);
+    expect(result[2]).toEqual(notes[2]);
   });
 
   it("adds trimmed tags alphabetically with their selected color", () => {

@@ -4,6 +4,7 @@ export interface Note {
   content: string;
   tags: string[];
   archived: boolean;
+  pinned: boolean;
   createdAt: string;
   updatedAt: string;
 }

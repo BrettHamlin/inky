@@ -13,10 +13,11 @@ import { filterNotes } from "@/lib/filter-notes";
 import { tagColorStyle } from "@/lib/tag-colors";
 import type { ActiveView, MobileSidebarMode, NoteFormData } from "@/types";
 import { format } from "date-fns";
-import { Search, X } from "lucide-react";
+import { Pin, PinOff, Search, X } from "lucide-react";
 
 const isMobileLayout = () =>
   typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
   !window.matchMedia("(min-width: 1280px)").matches;
 
 function NotesApp() {
@@ -28,6 +29,7 @@ function NotesApp() {
     updateNote,
     deleteNote,
     toggleArchive,
+    togglePin,
     createTag,
     deleteTag,
   } = useNotes();
@@ -216,32 +218,59 @@ function NotesApp() {
             </p>
           ) : (
             <div role="list" aria-label="Notes list">
-              {filteredNotes.map((note) => (
-                <button
-                  key={note.id}
-                  role="listitem"
-                  className="w-full text-left px-3 md:px-4 py-2.5 md:py-3 border-b border-border/50 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-                  onClick={() => handleSelectNote(note.id)}
-                >
-                  <h3 className="text-sm font-medium text-foreground truncate">
-                    {note.title || "Untitled"}
-                  </h3>
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {note.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex h-5 shrink-0 items-center rounded border px-2 py-0.5 text-[10px] font-medium"
-                        style={tagColorStyle(tagColors[tag])}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+              {filteredNotes.map((note) => {
+                const noteTitle = note.title || "Untitled";
+                const pinActionLabel = note.pinned
+                  ? `Unpin note: ${noteTitle}`
+                  : `Pin note: ${noteTitle}`;
+
+                return (
+                  <div
+                    key={note.id}
+                    role="listitem"
+                    data-testid="note-list-item"
+                    data-pinned={note.pinned ? "true" : "false"}
+                    className="flex w-full items-start gap-2 border-b border-border/50 px-3 py-2.5 transition-colors hover:bg-muted/50 md:px-4 md:py-3"
+                  >
+                    <button
+                      className="min-w-0 flex-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      onClick={() => handleSelectNote(note.id)}
+                    >
+                      <h3 className="truncate text-sm font-medium text-foreground">
+                        {noteTitle}
+                      </h3>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {note.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex h-5 shrink-0 items-center rounded border px-2 py-0.5 text-[10px] font-medium"
+                            style={tagColorStyle(tagColors[tag])}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-1.5">
+                        {format(new Date(note.updatedAt), "dd MMM yyyy")}
+                      </p>
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="mt-0.5"
+                      onClick={() => togglePin(note.id)}
+                      aria-label={pinActionLabel}
+                      title={note.pinned ? "Unpin note" : "Pin note"}
+                    >
+                      {note.pinned ? (
+                        <PinOff className="size-4" data-testid="pinoff-icon" />
+                      ) : (
+                        <Pin className="size-4" data-testid="pin-icon" />
+                      )}
+                    </Button>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-1.5">
-                    {format(new Date(note.updatedAt), "dd MMM yyyy")}
-                  </p>
-                </button>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -297,6 +326,7 @@ function NotesApp() {
               notes={filteredNotes}
               selectedNoteId={desktopSelectedNoteId}
               onSelectNote={handleSelectNote}
+              togglePin={togglePin}
               onCreateNew={handleCreateNew}
               searchQuery={searchQuery}
               tagColors={tagColors}
@@ -316,13 +346,18 @@ function NotesApp() {
               onSave={isCreating ? handleSaveNew : handleUpdate}
               onDelete={handleDelete}
               onArchive={toggleArchive}
+              onPin={togglePin}
               onCancel={handleCancel}
               availableTags={tags}
               tagColors={tagColors}
-              onBack={() => {
-                setSelectedNoteId(null);
-                setIsCreating(false);
-              }}
+              onBack={
+                isMobileLayout()
+                  ? () => {
+                      setSelectedNoteId(null);
+                      setIsCreating(false);
+                    }
+                  : undefined
+              }
             />
           ) : desktopEditorNote ? (
             <NoteEditor
@@ -331,6 +366,7 @@ function NotesApp() {
               onSave={(data) => updateNote(desktopEditorNote.id, data)}
               onDelete={handleDelete}
               onArchive={toggleArchive}
+              onPin={togglePin}
               onCancel={() => setSelectedNoteId(null)}
               availableTags={tags}
               tagColors={tagColors}
