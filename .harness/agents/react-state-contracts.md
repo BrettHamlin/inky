@@ -50,9 +50,11 @@ supports them.
   to the active view and does not leak hidden or archived records.
 - Adding inline controls to an existing selectable row, card, or list item must
   preserve the previous primary selection hit target unless the task explicitly
-  asks to shrink it. Use event propagation boundaries, split controls, or row
-  handlers without nesting buttons; do not silently make padding or non-control
-  row areas inert.
+  asks to shrink it. Use event propagation boundaries, split controls, or
+  keyboard-equivalent row handlers without nesting buttons; do not silently
+  make padding or non-control row areas inert. Preserving pointer selection via
+  `onClick` on a plain `div` while keyboard users must activate a smaller inner
+  button is not an equivalent selection contract.
 - Form changes preserve validation, trim/normalization rules, error display,
   and submit/cancel behavior.
 - Component state and context updates are localized; changes should not
@@ -69,7 +71,9 @@ supports them.
 - **D/error:** a feature drops an existing persistence key without migration,
   resets unrelated state during a normal interaction, breaks search/filter
   scoping, shrinks an existing primary row/card selection hit target while
-  adding an inline control, or omits validation for a common invalid input.
+  adding an inline control, preserves row/card selection only through a
+  pointer-only non-interactive container, or omits validation for a common
+  invalid input.
 - **C/warning:** narrow test coverage, minor copy mismatch, or a low-risk state
   edge case.
 - **A:** no React state-contract concerns in the diff.

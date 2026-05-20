@@ -47,6 +47,10 @@ remain in scope at warning/error severity when the reviewed diff supports them.
   must preserve the previous primary click/tap hit target unless the task explicitly
   asks to shrink it. Avoid nested buttons, but do not fix nesting by making
   padding or non-control row areas inert.
+- Do not preserve a row/card hit target by adding `onClick` to a plain `div`
+  or other non-interactive element unless it also has keyboard-equivalent
+  semantics and behavior. pointer-only row activation is not equivalent to a
+  real button/link hit target.
 - Dialogs, sheets, popovers, and mobile navigation preserve focus behavior,
   close/cancel semantics, and screen-reader labels.
 - Responsive changes do not hide primary actions, overlap text, or create
@@ -63,6 +67,8 @@ remain in scope at warning/error severity when the reviewed diff supports them.
   cannot complete the feature.
 - **D/error:** a new interactive control lacks an accessible name, focus is
   trapped or lost in a modal/sheet, responsive layout hides required controls,
-  or an inline-control change shrinks an existing primary click/tap hit target.
+  an inline-control change shrinks an existing primary click/tap hit target, or
+  a primary row/card/list-item hit target is preserved only for pointer users
+  through a non-keyboard-equivalent clickable container.
 - **C/warning:** minor copy, spacing, focus-ring, or test-coverage issue.
 - **A:** no accessibility or UX concerns in the diff.
