@@ -195,7 +195,7 @@ function NotesApp() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search notes..."
-                className="h-8 border-border !bg-transparent pl-8 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
+                className="h-8 border-border !bg-transparent pl-8 pr-8 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
                 aria-label="Search notes by title, tag, or content"
                 autoFocus
               />
@@ -290,7 +290,7 @@ function NotesApp() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, content, or tags..."
-              className="h-11 rounded-md border-border !bg-transparent pl-10 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
+              className="h-11 rounded-md border-border !bg-transparent pl-10 pr-9 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
               aria-label="Search notes by title, tag, or content"
             />
             {searchQuery && (

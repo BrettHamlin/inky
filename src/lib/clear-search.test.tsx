@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import "@testing-library/jest-dom/vitest";
 import { describe, expect, it, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -93,19 +94,17 @@ function getClearButton(input: HTMLInputElement) {
 }
 
 function expectRenderedAndVisible(button: HTMLElement | null) {
-  expect(button).not.toBeNull();
-  expect(button?.getAttribute("aria-hidden")).not.toBe("true");
-  expect(button?.style.display).not.toBe("none");
+  expect(button).toBeInTheDocument();
+  expect(button).toBeVisible();
 }
 
 function expectAbsentOrHidden(button: HTMLElement | null) {
-  if (!button) return;
+  if (!button) {
+    expect(button).toBeNull();
+    return;
+  }
 
-  expect(
-    button.hidden ||
-      button.getAttribute("aria-hidden") === "true" ||
-      button.style.display === "none",
-  ).toBe(true);
+  expect(button).not.toBeVisible();
 }
 
 async function openMobileSearch() {
@@ -147,7 +146,7 @@ describe("clear search control", () => {
 
     const input = getSearchInput(desktopSearchPlaceholder);
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     expectAbsentOrHidden(queryClearButton(input));
   });
 
@@ -169,12 +168,12 @@ describe("clear search control", () => {
 
     const input = getSearchInput(desktopSearchPlaceholder);
     await user.type(input, "hello");
-    expect(input.value).toBe("hello");
+    expect(input).toHaveValue("hello");
 
     await user.click(getClearButton(input));
 
-    expect(input.value).toBe("");
-    expect(document.activeElement).toBe(input);
+    expect(input).toHaveValue("");
+    expect(input).toHaveFocus();
   });
 
   //harness:criterion=c-clear-btn-hidden-when-empty-mobile
@@ -183,7 +182,7 @@ describe("clear search control", () => {
 
     const input = await openMobileSearch();
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     expectAbsentOrHidden(queryClearButton(input));
   });
 
@@ -205,12 +204,12 @@ describe("clear search control", () => {
 
     const input = await openMobileSearch();
     await user.type(input, "hello");
-    expect(input.value).toBe("hello");
+    expect(input).toHaveValue("hello");
 
     await user.click(getClearButton(input));
 
-    expect(input.value).toBe("");
-    expect(document.activeElement).toBe(input);
+    expect(input).toHaveValue("");
+    expect(input).toHaveFocus();
   });
 
   //harness:criterion=c-clear-preserves-tag-filter
@@ -223,7 +222,7 @@ describe("clear search control", () => {
     await user.type(input, "shared");
     await user.click(getClearButton(input));
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     expect(screen.queryAllByText("Work Alpha").length).toBeGreaterThan(0);
     expect(screen.queryAllByText("Personal Beta")).toHaveLength(0);
     expect(screen.queryAllByText("Archived Gamma")).toHaveLength(0);
@@ -239,7 +238,7 @@ describe("clear search control", () => {
     await user.type(input, "shared");
     await user.click(getClearButton(input));
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     expect(screen.queryAllByText("Archived Gamma").length).toBeGreaterThan(0);
     expect(screen.queryAllByText("Work Alpha")).toHaveLength(0);
     expect(screen.queryAllByText("Personal Beta")).toHaveLength(0);
@@ -254,7 +253,7 @@ describe("clear search control", () => {
     const input = await openMobileSearch();
     const maybeClearButton = queryClearButton(input);
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     if (maybeClearButton) {
       expect(() => fireEvent.click(maybeClearButton)).not.toThrow();
     }
@@ -273,7 +272,7 @@ describe("clear search control", () => {
     const input = getSearchInput(desktopSearchPlaceholder);
     const maybeClearButton = queryClearButton(input);
 
-    expect(input.value).toBe("");
+    expect(input).toHaveValue("");
     if (maybeClearButton) {
       expect(() => fireEvent.click(maybeClearButton)).not.toThrow();
     }
