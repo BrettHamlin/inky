@@ -225,6 +225,8 @@ describe("App search clearing", () => {
   it("preserves the active tag filter after clearing search", () => {
     // harness:criterion=c-clear-does-not-change-tag-filter
     renderApp();
+    expect(document.body.textContent).toContain("Japan Travel Planning");
+
     const devTagButton = Array.from(document.querySelectorAll("button")).find(
       (button) => button.textContent?.trim() === "Dev",
     );
@@ -239,7 +241,7 @@ describe("App search clearing", () => {
     expect(document.body.textContent).not.toContain("Japan Travel Planning");
   });
 
-  it("preserves the archived view after clearing search", () => {
+  it("preserves the archived view after clearing mobile search", () => {
     // harness:criterion=c-clear-does-not-change-archived-view
     renderApp();
     const archivedViewButton = Array.from(
@@ -247,10 +249,12 @@ describe("App search clearing", () => {
     ).find((button) => button.textContent?.includes("Archived Notes"));
     expect(archivedViewButton).toBeDefined();
     click(archivedViewButton as HTMLButtonElement);
+    expect(document.body.textContent).toContain("Archived Notes");
 
-    const desktopSearch = byTestId<HTMLInputElement>("desktop-search-input");
-    changeInput(desktopSearch, "react");
-    click(byTestId("desktop-clear-search"));
+    openMobileSearch();
+    const mobileSearch = byTestId<HTMLInputElement>("mobile-search-input");
+    changeInput(mobileSearch, "react");
+    click(byTestId("mobile-clear-search"));
 
     expect(document.body.textContent).toContain("Archived Notes");
     expect(document.body.textContent).toContain("Old React Notes");
