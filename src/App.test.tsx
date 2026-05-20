@@ -61,7 +61,11 @@ async function openMobileSearch(user: ReturnType<typeof userEvent.setup>) {
 }
 
 async function selectDevTag(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole("button", { name: "Dev" }));
+  await user.click(getDesktopDevTagButton());
+}
+
+function getDesktopDevTagButton() {
+  return screen.getByRole("button", { name: "Dev" });
 }
 
 async function switchToArchivedView(user: ReturnType<typeof userEvent.setup>) {
@@ -118,9 +122,13 @@ describe("App search clear controls", () => {
     await openMobileSearch(user);
 
     await user.type(screen.getByTestId("desktop-search-input"), "hello");
+    expect(screen.getByTestId("desktop-clear-btn")).toBeVisible();
 
-    expect(screen.getByTestId("desktop-clear-btn")).toBeInTheDocument();
-    expect(screen.getByTestId("mobile-clear-btn")).toBeInTheDocument();
+    await user.clear(screen.getByTestId("desktop-search-input"));
+    await user.type(screen.getByTestId("mobile-search-input"), "hello");
+
+    expect(screen.getByTestId("mobile-clear-btn")).toBeVisible();
+    expect(screen.getByTestId("desktop-clear-btn")).toBeVisible();
   });
 
   //harness:criterion=c-clear-btn-desktop-resets-query,c-clear-btn-desktop-restores-focus,c-desktop-input-ref-attached,c-clear-btn-hidden-after-clear
@@ -161,9 +169,12 @@ describe("App search clear controls", () => {
     renderApp();
 
     await selectDevTag(user);
+    const selectedClassName = getDesktopDevTagButton().className;
     await user.type(screen.getByTestId("desktop-search-input"), "roadmap");
     await user.click(screen.getByTestId("desktop-clear-btn"));
 
+    expect(getDesktopDevTagButton()).toHaveClass("bg-primary/15");
+    expect(getDesktopDevTagButton().className).toBe(selectedClassName);
     expect(screen.getAllByText("Dev Roadmap").length).toBeGreaterThan(0);
     expect(screen.queryByText("Personal Roadmap")).not.toBeInTheDocument();
   });
@@ -175,9 +186,12 @@ describe("App search clear controls", () => {
     const mobileInput = await openMobileSearch(user);
 
     await selectDevTag(user);
+    const selectedClassName = getDesktopDevTagButton().className;
     await user.type(mobileInput, "roadmap");
     await user.click(screen.getByTestId("mobile-clear-btn"));
 
+    expect(getDesktopDevTagButton()).toHaveClass("bg-primary/15");
+    expect(getDesktopDevTagButton().className).toBe(selectedClassName);
     expect(screen.getAllByText("Dev Roadmap").length).toBeGreaterThan(0);
     expect(screen.queryByText("Personal Roadmap")).not.toBeInTheDocument();
   });
