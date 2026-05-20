@@ -83,6 +83,10 @@ function renderApp() {
   return render(<App />);
 }
 
+function getDesktopSearchInput() {
+  return screen.getByTestId("desktop-search-input") as HTMLInputElement;
+}
+
 function desktopNoteTitles() {
   const noteLists = screen.getAllByRole("list", { name: "Notes list" });
   const desktopList = noteLists[noteLists.length - 1];
@@ -175,12 +179,11 @@ describe("search clear behavior", () => {
     renderApp();
 
     const mobileSearchInput = await openMobileSearch(user);
-    const desktopSearchInput = screen.getByTestId(
-      "desktop-search-input",
-    ) as HTMLInputElement;
+    const desktopSearchInput = getDesktopSearchInput();
     await user.type(mobileSearchInput, "react");
     await user.click(screen.getByTestId("clear-search-button-mobile"));
 
+    expect(mobileSearchInput).toBeInstanceOf(HTMLInputElement);
     expect(mobileSearchInput).toHaveValue("");
     expect(desktopSearchInput).toHaveValue("");
     expect(document.activeElement).toBe(mobileSearchInput);
@@ -191,12 +194,11 @@ describe("search clear behavior", () => {
     const user = userEvent.setup();
     renderApp();
 
-    const desktopSearchInput = screen.getByTestId(
-      "desktop-search-input",
-    ) as HTMLInputElement;
+    const desktopSearchInput = getDesktopSearchInput();
     await user.type(desktopSearchInput, "react");
     await user.click(screen.getByTestId("clear-search-button-desktop"));
 
+    expect(desktopSearchInput).toBeInstanceOf(HTMLInputElement);
     expect(desktopSearchInput).toHaveValue("");
     expect(document.activeElement).toBe(desktopSearchInput);
   });
@@ -207,7 +209,7 @@ describe("search clear behavior", () => {
     renderApp();
 
     await user.click(screen.getByRole("button", { name: /^Dev$/ }));
-    const desktopSearchInput = screen.getByTestId("desktop-search-input");
+    const desktopSearchInput = getDesktopSearchInput();
     await user.type(desktopSearchInput, "react");
     await user.click(screen.getByTestId("clear-search-button-desktop"));
 
@@ -226,7 +228,7 @@ describe("search clear behavior", () => {
     renderApp();
 
     await user.click(screen.getByRole("button", { name: /^Archived Notes$/ }));
-    const desktopSearchInput = screen.getByTestId("desktop-search-input");
+    const desktopSearchInput = getDesktopSearchInput();
     await user.type(desktopSearchInput, "react");
     await user.click(screen.getByTestId("clear-search-button-desktop"));
 

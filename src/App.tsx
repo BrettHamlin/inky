@@ -124,15 +124,18 @@ function NotesApp() {
     [deleteTag, selectedTag],
   );
 
-  const handleClearMobileSearch = useCallback(() => {
+  const clearSearchAndFocus = useCallback((input: HTMLInputElement | null) => {
     setSearchQuery("");
-    mobileSearchInputRef.current?.focus();
+    input?.focus();
   }, []);
 
+  const handleClearMobileSearch = useCallback(() => {
+    clearSearchAndFocus(mobileSearchInputRef.current);
+  }, [clearSearchAndFocus]);
+
   const handleClearDesktopSearch = useCallback(() => {
-    setSearchQuery("");
-    desktopSearchInputRef.current?.focus();
-  }, []);
+    clearSearchAndFocus(desktopSearchInputRef.current);
+  }, [clearSearchAndFocus]);
 
   const showEditor = isCreating || selectedNoteId !== null;
   const desktopEditorNote =
