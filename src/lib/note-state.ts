@@ -10,6 +10,7 @@ export function createNoteRecord(
     title: data.title,
     content: data.content,
     tags: data.tags,
+    pinned: false,
     archived: false,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -40,6 +41,12 @@ export function toggleArchiveById(
     note.id === id
       ? { ...note, archived: !note.archived, updatedAt: timestamp }
       : note,
+  );
+}
+
+export function togglePinById(notes: Note[], id: string) {
+  return notes.map((note) =>
+    note.id === id ? { ...note, pinned: !note.pinned } : note,
   );
 }
 
