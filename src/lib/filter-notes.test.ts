@@ -37,6 +37,7 @@ function ids(result: Note[]) {
 }
 
 describe("filterNotes", () => {
+  //harness:criterion=c-existing-filter-tests-still-pass
   it("searches active notes by title", () => {
     expect(
       ids(

@@ -207,6 +207,7 @@ function NotesApp() {
                   type="button"
                   data-testid="mobile-clear-search-btn"
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onMouseDown={(event) => event.preventDefault()}
                   onClick={handleClearMobileSearch}
                   aria-label="Clear search"
                 >
@@ -301,6 +302,7 @@ function NotesApp() {
                 type="button"
                 data-testid="desktop-clear-search-btn"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={handleClearDesktopSearch}
                 aria-label="Clear search"
               >

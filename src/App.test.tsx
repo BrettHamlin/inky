@@ -116,6 +116,7 @@ describe("App search clear controls", () => {
     await user.click(screen.getByTestId("mobile-clear-search-btn"));
 
     expect(mobileSearchInput).toHaveValue("");
+    expect(screen.queryByTestId("mobile-clear-search-btn")).not.toBeInTheDocument();
   });
 
   //harness:criterion=c-desktop-clear-resets-search-query
@@ -128,6 +129,7 @@ describe("App search clear controls", () => {
     await user.click(screen.getByTestId("desktop-clear-search-btn"));
 
     expect(desktopSearchInput).toHaveValue("");
+    expect(screen.queryByTestId("desktop-clear-search-btn")).not.toBeInTheDocument();
   });
 
   //harness:criterion=c-mobile-clear-preserves-selected-tag
@@ -220,6 +222,9 @@ describe("App search clear controls", () => {
 
   //harness:criterion=c-jsdom-env-configured
   it("runs with DOM APIs available from the configured Vitest environment", () => {
+    const viteConfig = fs.readFileSync(path.join(repoRoot, "vite.config.ts"), "utf8");
+
+    expect(viteConfig).toContain("jsdom");
     expect(document.createElement("input")).toBeInstanceOf(HTMLInputElement);
   });
 
