@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { NotesProvider, useNotes } from "@/store/notes-context";
 import { ThemeProvider } from "@/store/theme-context";
 import { Sidebar } from "@/components/Sidebar";
@@ -42,6 +42,8 @@ function NotesApp() {
   const [mobileSidebarMode, setMobileSidebarMode] =
     useState<MobileSidebarMode>("tags");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
 
   const filteredNotes = useMemo(() => {
     return filterNotes(notes, { activeView, selectedTag, searchQuery });
@@ -122,6 +124,16 @@ function NotesApp() {
     [deleteTag, selectedTag],
   );
 
+  const handleClearMobileSearch = useCallback(() => {
+    setSearchQuery("");
+    mobileSearchInputRef.current?.focus();
+  }, []);
+
+  const handleClearDesktopSearch = useCallback(() => {
+    setSearchQuery("");
+    desktopSearchInputRef.current?.focus();
+  }, []);
+
   const showEditor = isCreating || selectedNoteId !== null;
   const desktopEditorNote =
     selectedNote ??
@@ -179,21 +191,27 @@ function NotesApp() {
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
+                ref={mobileSearchInputRef}
+                data-testid="mobile-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search notes..."
-                className="h-8 border-border !bg-transparent pl-8 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
-                aria-label="Search notes by title, tag, or content"
+                className="h-8 border-border !bg-transparent pl-8 pr-8 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
+                aria-label="Search mobile notes by title, tag, or content"
                 autoFocus
               />
               {searchQuery && (
-                <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  onClick={() => setSearchQuery("")}
-                  aria-label="Clear search"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={handleClearMobileSearch}
+                  aria-label="Clear mobile search"
+                  data-testid="mobile-clear-search-btn"
                 >
-                  <X className="size-3.5" />
-                </button>
+                  <X className="size-3.5" aria-hidden="true" />
+                </Button>
               )}
             </div>
             <Button
@@ -270,20 +288,26 @@ function NotesApp() {
           <div className="relative w-[300px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <Input
+              ref={desktopSearchInputRef}
+              data-testid="desktop-search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, content, or tags..."
-              className="h-11 rounded-md border-border !bg-transparent pl-10 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
-              aria-label="Search notes by title, tag, or content"
+              className="h-11 rounded-md border-border !bg-transparent pl-10 pr-10 text-sm shadow-none hover:!bg-transparent focus-visible:!bg-transparent focus-visible:ring-0"
+              aria-label="Search desktop notes by title, tag, or content"
             />
             {searchQuery && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                onClick={() => setSearchQuery("")}
-                aria-label="Clear search"
+                onClick={handleClearDesktopSearch}
+                aria-label="Clear desktop search"
+                data-testid="desktop-clear-search-btn"
               >
-                <X className="size-3.5" />
-              </button>
+                <X className="size-3.5" aria-hidden="true" />
+              </Button>
             )}
           </div>
           <div className="flex items-center gap-2">
