@@ -126,6 +126,8 @@ describe("search clear behavior", () => {
     render(<Input ref={ref} aria-label="Forwarded ref input" />);
 
     expect(ref.current).toBeInstanceOf(HTMLInputElement);
+    ref.current?.focus();
+    expect(document.activeElement).toBe(ref.current);
   });
 
   //harness:criterion=c-clear-button-hidden-when-query-empty,c-empty-query-behavior-unchanged

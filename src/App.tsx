@@ -124,10 +124,15 @@ function NotesApp() {
     [deleteTag, selectedTag],
   );
 
-  const clearSearchAndFocus = useCallback((input: HTMLInputElement | null) => {
-    setSearchQuery("");
-    input?.focus();
-  }, []);
+  const clearSearchAndFocus = useCallback(
+    (input: HTMLInputElement | null) => {
+      if (!searchQuery) return;
+
+      setSearchQuery("");
+      input?.focus();
+    },
+    [searchQuery],
+  );
 
   const handleClearMobileSearch = useCallback(() => {
     clearSearchAndFocus(mobileSearchInputRef.current);
