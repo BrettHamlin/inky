@@ -210,7 +210,7 @@ function NotesApp() {
                   aria-label="Clear mobile search"
                   data-testid="mobile-clear-search-btn"
                 >
-                  <X className="size-3.5" />
+                  <X className="size-3.5" aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -306,7 +306,7 @@ function NotesApp() {
                 aria-label="Clear desktop search"
                 data-testid="desktop-clear-search-btn"
               >
-                <X className="size-3.5" />
+                <X className="size-3.5" aria-hidden="true" />
               </Button>
             )}
           </div>

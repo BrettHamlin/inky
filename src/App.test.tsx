@@ -127,6 +127,37 @@ describe("App clear search controls", () => {
     expect(screen.getByTestId("mobile-clear-search-btn")).toBeVisible();
   });
 
+  // harness:criterion=c-clear-btn-hidden-when-empty-desktop,c-clear-btn-visible-when-nonempty-desktop,c-clear-btn-hidden-when-empty-mobile,c-clear-btn-visible-when-nonempty-mobile
+  it("toggles both clear-search buttons as the shared query becomes populated and empty", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const mobileInput = await openMobileSearch(user);
+    const desktopInput = screen.getByTestId("desktop-search-input");
+
+    expect(screen.queryByTestId("desktop-clear-search-btn")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mobile-clear-search-btn")).not.toBeInTheDocument();
+
+    await user.type(desktopInput, "react");
+
+    expect(screen.getByTestId("desktop-clear-search-btn")).toBeVisible();
+    expect(screen.getByTestId("mobile-clear-search-btn")).toBeVisible();
+
+    await user.click(screen.getByTestId("desktop-clear-search-btn"));
+
+    expect(screen.queryByTestId("desktop-clear-search-btn")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mobile-clear-search-btn")).not.toBeInTheDocument();
+
+    await user.type(mobileInput, "api");
+
+    expect(screen.getByTestId("desktop-clear-search-btn")).toBeVisible();
+    expect(screen.getByTestId("mobile-clear-search-btn")).toBeVisible();
+
+    await user.click(screen.getByTestId("mobile-clear-search-btn"));
+
+    expect(screen.queryByTestId("desktop-clear-search-btn")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mobile-clear-search-btn")).not.toBeInTheDocument();
+  });
+
   // harness:criterion=c-clear-btn-clears-query-desktop,c-clear-btn-restores-focus-desktop,c-desktop-search-input-has-ref
   it("clears the desktop query and restores focus to the desktop input", async () => {
     const user = userEvent.setup();
