@@ -1,6 +1,8 @@
+// @vitest-environment jsdom
+
 import "@testing-library/jest-dom/vitest";
 
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -123,7 +125,7 @@ describe("search clear behavior", () => {
   });
 
   //harness:criterion=c-clear-button-hidden-when-query-empty,c-empty-query-behavior-unchanged
-  it("does not render clear buttons for an empty query and leaves focus and notes unchanged", async () => {
+  it("hides clear buttons for an empty query and leaves focus and notes unchanged when clear is attempted", async () => {
     const user = userEvent.setup();
     renderApp();
     await openMobileSearch(user);
@@ -138,13 +140,19 @@ describe("search clear behavior", () => {
     const activeBefore = document.activeElement;
     const titlesBefore = desktopNoteTitles();
 
-    const hiddenClearButton = screen.queryByTestId(
-      "clear-search-button-desktop",
-    );
-    if (hiddenClearButton) {
-      await user.click(hiddenClearButton);
+    let thrown: unknown;
+    try {
+      const hiddenClearButton = screen.queryByTestId(
+        "clear-search-button-desktop",
+      );
+      if (hiddenClearButton) {
+        await user.click(hiddenClearButton);
+      }
+    } catch (error) {
+      thrown = error;
     }
 
+    expect(thrown).toBeUndefined();
     expect(document.activeElement).toBe(activeBefore);
     expect(desktopNoteTitles()).toEqual(titlesBefore);
   });
@@ -167,10 +175,14 @@ describe("search clear behavior", () => {
     renderApp();
 
     const mobileSearchInput = await openMobileSearch(user);
+    const desktopSearchInput = screen.getByTestId(
+      "desktop-search-input",
+    ) as HTMLInputElement;
     await user.type(mobileSearchInput, "react");
     await user.click(screen.getByTestId("clear-search-button-mobile"));
 
     expect(mobileSearchInput).toHaveValue("");
+    expect(desktopSearchInput).toHaveValue("");
     expect(document.activeElement).toBe(mobileSearchInput);
   });
 
@@ -267,18 +279,8 @@ describe("search clear behavior", () => {
         jsdom: expect.any(String),
       }),
     );
-  });
 
-  //harness:criterion=c-empty-query-behavior-unchanged
-  it("does not throw when an empty-query clear click is attempted", () => {
-    renderApp();
-
-    const clearButton = screen.queryByTestId("clear-search-button-desktop");
-
-    expect(() => {
-      if (clearButton) {
-        fireEvent.click(clearButton);
-      }
-    }).not.toThrow();
+    expect(readFileSync(resolve(process.cwd(), "vite.config.ts"), "utf8"))
+      .toMatch(/environment:\s*["']jsdom["']/);
   });
 });
