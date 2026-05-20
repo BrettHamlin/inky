@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { NotesProvider, useNotes } from "@/store/notes-context";
 import { ThemeProvider } from "@/store/theme-context";
 import { Sidebar } from "@/components/Sidebar";
@@ -37,6 +37,8 @@ function NotesApp() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileSidebarMode, setMobileSidebarMode] =
@@ -122,6 +124,16 @@ function NotesApp() {
     [deleteTag, selectedTag],
   );
 
+  const handleClearMobileSearch = useCallback(() => {
+    setSearchQuery("");
+    mobileSearchInputRef.current?.focus();
+  }, []);
+
+  const handleClearDesktopSearch = useCallback(() => {
+    setSearchQuery("");
+    desktopSearchInputRef.current?.focus();
+  }, []);
+
   const showEditor = isCreating || selectedNoteId !== null;
   const desktopEditorNote =
     selectedNote ??
@@ -179,6 +191,7 @@ function NotesApp() {
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
               <Input
+                ref={mobileSearchInputRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search notes..."
@@ -187,13 +200,16 @@ function NotesApp() {
                 autoFocus
               />
               {searchQuery && (
-                <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  onClick={() => setSearchQuery("")}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={handleClearMobileSearch}
                   aria-label="Clear search"
                 >
                   <X className="size-3.5" />
-                </button>
+                </Button>
               )}
             </div>
             <Button
@@ -270,6 +286,7 @@ function NotesApp() {
           <div className="relative w-[300px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <Input
+              ref={desktopSearchInputRef}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, content, or tags..."
@@ -277,13 +294,16 @@ function NotesApp() {
               aria-label="Search notes by title, tag, or content"
             />
             {searchQuery && (
-              <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                onClick={() => setSearchQuery("")}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                onClick={handleClearDesktopSearch}
                 aria-label="Clear search"
               >
                 <X className="size-3.5" />
-              </button>
+              </Button>
             )}
           </div>
           <div className="flex items-center gap-2">
