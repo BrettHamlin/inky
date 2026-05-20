@@ -226,6 +226,11 @@ describe("clear search control", () => {
     expect(screen.queryAllByText("Work Alpha").length).toBeGreaterThan(0);
     expect(screen.queryAllByText("Personal Beta")).toHaveLength(0);
     expect(screen.queryAllByText("Archived Gamma")).toHaveLength(0);
+
+    await user.click(screen.getAllByRole("button", { name: "Work" })[0]);
+
+    expect(screen.queryAllByText("Work Alpha").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("Personal Beta").length).toBeGreaterThan(0);
   });
 
   //harness:criterion=c-clear-preserves-archived-filter
@@ -242,6 +247,12 @@ describe("clear search control", () => {
     expect(screen.queryAllByText("Archived Gamma").length).toBeGreaterThan(0);
     expect(screen.queryAllByText("Work Alpha")).toHaveLength(0);
     expect(screen.queryAllByText("Personal Beta")).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "All Notes" }));
+
+    expect(screen.queryAllByText("Work Alpha").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("Personal Beta").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("Archived Gamma")).toHaveLength(0);
   });
 
   //harness:criterion=c-clear-noop-when-empty-mobile
