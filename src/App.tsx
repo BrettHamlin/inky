@@ -125,13 +125,15 @@ function NotesApp() {
   );
 
   const handleClearMobileSearch = useCallback(() => {
+    const input = mobileSearchInputRef.current;
     setSearchQuery("");
-    mobileSearchInputRef.current?.focus();
+    input?.focus();
   }, []);
 
   const handleClearDesktopSearch = useCallback(() => {
+    const input = desktopSearchInputRef.current;
     setSearchQuery("");
-    desktopSearchInputRef.current?.focus();
+    input?.focus();
   }, []);
 
   const showEditor = isCreating || selectedNoteId !== null;

@@ -48,6 +48,7 @@ const notes: Note[] = [
 
 function seedNotes() {
   localStorage.setItem("inky-notes", JSON.stringify(notes));
+  localStorage.setItem("inky-tags", JSON.stringify(["Dev", "Personal"]));
 }
 
 function renderApp() {
