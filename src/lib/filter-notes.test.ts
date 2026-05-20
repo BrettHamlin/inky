@@ -98,6 +98,7 @@ describe("filterNotes", () => {
   });
 
   it("only searches archived notes in the archived view", () => {
+    // harness:criterion=c-filter-notes-archived-passes
     expect(
       ids(
         filterNotes(notes, {
@@ -110,6 +111,7 @@ describe("filterNotes", () => {
   });
 
   it("combines selected tag and search query", () => {
+    // harness:criterion=c-filter-notes-tag-search-passes
     expect(
       ids(
         filterNotes(notes, {
@@ -132,6 +134,7 @@ describe("filterNotes", () => {
   });
 
   it("returns all notes in the current view for a blank query", () => {
+    // harness:criterion=c-filter-notes-blank-query-passes
     expect(
       ids(
         filterNotes(notes, {
