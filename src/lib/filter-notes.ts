@@ -40,5 +40,8 @@ export function filterNotes(
     );
   }
 
-  return result;
+  return [
+    ...result.filter((note) => note.pinned),
+    ...result.filter((note) => !note.pinned),
+  ];
 }

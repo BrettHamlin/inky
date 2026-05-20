@@ -5,6 +5,7 @@ import {
   deleteNoteById,
   removeTag,
   toggleArchiveById,
+  togglePinById,
   updateNoteById,
 } from "./note-state.ts";
 import type { ColorTheme, Note } from "@/types";
@@ -19,6 +20,7 @@ function note(overrides: Partial<Note> = {}): Note {
     content: "Body",
     tags: ["General"],
     archived: false,
+    pinned: false,
     createdAt: timestamp,
     updatedAt: timestamp,
     ...overrides,
@@ -26,6 +28,7 @@ function note(overrides: Partial<Note> = {}): Note {
 }
 
 describe("note state helpers", () => {
+  //harness:criterion=c-create-note-record-pinned-default-false,c-newly-created-notes-default-unpinned
   it("creates a new active note with matching created and updated timestamps", () => {
     expect(
       createNoteRecord(
@@ -39,8 +42,58 @@ describe("note state helpers", () => {
       content: "<p>Hello</p>",
       tags: ["Dev"],
       archived: false,
+      pinned: false,
       createdAt: timestamp,
       updatedAt: timestamp,
+    });
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-pins-unpinned-note
+  it("pins only the matching unpinned note", () => {
+    const notes = [
+      note({ id: "1", title: "Target" }),
+      note({ id: "2", title: "Other", tags: ["Keep"], updatedAt: timestamp }),
+    ];
+    const result = togglePinById(notes, "1", laterTimestamp);
+
+    expect(result).not.toBe(notes);
+    expect(result[0].pinned).toBe(true);
+    expect(result[1]).toEqual(notes[1]);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-unpins-pinned-note
+  it("unpins only the matching pinned note", () => {
+    const notes = [
+      note({ id: "1", pinned: true }),
+      note({ id: "2", title: "Other", tags: ["Keep"], updatedAt: timestamp }),
+    ];
+    const result = togglePinById(notes, "1", laterTimestamp);
+
+    expect(result[0].pinned).toBe(false);
+    expect(result[1]).toEqual(notes[1]);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-updates-timestamp
+  it("refreshes the updated timestamp when toggling a pin", () => {
+    const result = togglePinById([note({ id: "target" })], "target", laterTimestamp);
+
+    expect(result[0].updatedAt).toBe(laterTimestamp);
+  });
+
+  //harness:criterion=c-toggle-pin-by-id-unknown-id-no-op
+  it("leaves note content unchanged when toggling an unknown id", () => {
+    const notes = [
+      note({ id: "1", pinned: false, updatedAt: timestamp }),
+      note({ id: "2", pinned: true, updatedAt: laterTimestamp }),
+    ];
+    const result = togglePinById(notes, "missing", "2099-01-01T00:00:00.000Z");
+
+    expect(result).not.toBe(notes);
+    expect(result).toEqual(notes);
+    expect(result).toHaveLength(notes.length);
+    result.forEach((resultNote, index) => {
+      expect(resultNote.pinned).toBe(notes[index].pinned);
+      expect(resultNote.updatedAt).toBe(notes[index].updatedAt);
     });
   });
 

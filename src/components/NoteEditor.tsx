@@ -6,7 +6,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { tagColorStyle } from "@/lib/tag-colors";
 import type { ColorTheme, Note, NoteFormData } from "@/types";
-import { Archive, Clock3, Tag, Trash2, X, ArrowLeft } from "lucide-react";
+import {
+  Archive,
+  ArrowLeft,
+  Clock3,
+  Pin,
+  PinOff,
+  Tag,
+  Trash2,
+  X,
+} from "lucide-react";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -22,6 +31,7 @@ interface NoteEditorProps {
   onSave: (data: NoteFormData) => void;
   onDelete: (id: string) => void;
   onArchive: (id: string) => void;
+  onTogglePin: (id: string) => void;
   onCancel: () => void;
   availableTags: string[];
   tagColors: Record<string, ColorTheme>;
@@ -37,6 +47,7 @@ export function NoteEditor({
   onSave,
   onDelete,
   onArchive,
+  onTogglePin,
   onCancel,
   availableTags,
   tagColors,
@@ -91,6 +102,8 @@ export function NoteEditor({
   };
 
   const selectableTags = availableTags.filter((tag) => !tags.includes(tag));
+  const pinLabel = note?.pinned ? "Unpin note" : "Pin note";
+  const PinIcon = note?.pinned ? PinOff : Pin;
 
   return (
     <div
@@ -117,6 +130,15 @@ export function NoteEditor({
         <div className="flex items-center gap-1 shrink-0">
           {note && (
             <>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onTogglePin(note.id)}
+                title={pinLabel}
+                aria-label={pinLabel}
+              >
+                <PinIcon className="size-4" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -268,6 +290,15 @@ export function NoteEditor({
       <aside className="hidden w-[260px] shrink-0 border-l border-border px-4 py-5 xl:block">
         {note && (
           <div className="flex flex-col gap-3">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => onTogglePin(note.id)}
+              title={pinLabel}
+              aria-label={pinLabel}
+            >
+              <PinIcon className="size-4" />
+            </Button>
             <Button
               variant="outline"
               className="h-11 justify-start gap-3 rounded-md px-4 text-base font-normal"

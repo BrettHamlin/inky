@@ -11,6 +11,7 @@ export function createNoteRecord(
     content: data.content,
     tags: data.tags,
     archived: false,
+    pinned: false,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -39,6 +40,18 @@ export function toggleArchiveById(
   return notes.map((note) =>
     note.id === id
       ? { ...note, archived: !note.archived, updatedAt: timestamp }
+      : note,
+  );
+}
+
+export function togglePinById(
+  notes: Note[],
+  id: string,
+  timestamp: string,
+) {
+  return notes.map((note) =>
+    note.id === id
+      ? { ...note, pinned: !note.pinned, updatedAt: timestamp }
       : note,
   );
 }
