@@ -257,14 +257,24 @@ describe("App search clearing", () => {
     expect(document.body.textContent).not.toContain("Japan Travel Planning");
   });
 
-  it("does not focus desktop or mobile search on initial render", () => {
-    // harness:criterion=c-desktop-focus-not-stolen-on-mount,c-mobile-focus-not-stolen-on-mount
+  it("does not focus the desktop search on initial render", () => {
+    // harness:criterion=c-desktop-focus-not-stolen-on-mount
     renderApp();
 
     expect(document.activeElement).not.toBe(
       byTestId<HTMLInputElement>("desktop-search-input"),
     );
-    expect(queryByTestId("mobile-search-input")).toBeNull();
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("does not focus the mobile search when it first opens empty", () => {
+    // harness:criterion=c-mobile-focus-not-stolen-on-mount
+    renderApp();
+    openMobileSearch();
+
+    expect(document.activeElement).not.toBe(
+      byTestId<HTMLInputElement>("mobile-search-input"),
+    );
     expect(document.activeElement).toBe(document.body);
   });
 
