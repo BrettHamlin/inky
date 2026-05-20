@@ -43,6 +43,10 @@ remain in scope at warning/error severity when the reviewed diff supports them.
   use real buttons/links/inputs or equivalent ARIA semantics.
 - Icon-only controls have accessible names; destructive or state-changing
   controls communicate what they affect.
+- Adding a new inline action to an existing clickable row, card, or list item
+  must preserve the previous primary click/tap hit target unless the task explicitly
+  asks to shrink it. Avoid nested buttons, but do not fix nesting by making
+  padding or non-control row areas inert.
 - Dialogs, sheets, popovers, and mobile navigation preserve focus behavior,
   close/cancel semantics, and screen-reader labels.
 - Responsive changes do not hide primary actions, overlap text, or create
@@ -58,7 +62,7 @@ remain in scope at warning/error severity when the reviewed diff supports them.
   action has no accessible label or confirmation when needed, or mobile users
   cannot complete the feature.
 - **D/error:** a new interactive control lacks an accessible name, focus is
-  trapped or lost in a modal/sheet, or responsive layout hides required
-  controls.
+  trapped or lost in a modal/sheet, responsive layout hides required controls,
+  or an inline-control change shrinks an existing primary click/tap hit target.
 - **C/warning:** minor copy, spacing, focus-ring, or test-coverage issue.
 - **A:** no accessibility or UX concerns in the diff.

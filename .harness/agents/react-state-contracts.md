@@ -48,6 +48,11 @@ supports them.
   migration.
 - Search, filtering, archive, tag, sorting, and selection behavior stays scoped
   to the active view and does not leak hidden or archived records.
+- Adding inline controls to an existing selectable row, card, or list item must
+  preserve the previous primary selection hit target unless the task explicitly
+  asks to shrink it. Use event propagation boundaries, split controls, or row
+  handlers without nesting buttons; do not silently make padding or non-control
+  row areas inert.
 - Form changes preserve validation, trim/normalization rules, error display,
   and submit/cancel behavior.
 - Component state and context updates are localized; changes should not
@@ -63,7 +68,8 @@ supports them.
   unusable.
 - **D/error:** a feature drops an existing persistence key without migration,
   resets unrelated state during a normal interaction, breaks search/filter
-  scoping, or omits validation for a common invalid input.
+  scoping, shrinks an existing primary row/card selection hit target while
+  adding an inline control, or omits validation for a common invalid input.
 - **C/warning:** narrow test coverage, minor copy mismatch, or a low-risk state
   edge case.
 - **A:** no React state-contract concerns in the diff.
