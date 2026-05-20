@@ -2,12 +2,12 @@
 
 import "@testing-library/jest-dom/vitest";
 
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import React from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "@/App";
 import { Input } from "@/components/ui/input";
 import { filterNotes } from "@/lib/filter-notes";
@@ -78,6 +78,27 @@ function seedLocalStorage(notes = seedNotes) {
   );
 }
 
+function createMemoryStorage(): Storage {
+  let store: Record<string, string> = {};
+
+  return {
+    get length() {
+      return Object.keys(store).length;
+    },
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+  };
+}
+
 function renderApp() {
   seedLocalStorage();
   return render(<App />);
@@ -102,6 +123,12 @@ async function openMobileSearch(user: ReturnType<typeof userEvent.setup>) {
 }
 
 beforeEach(() => {
+  const storage = createMemoryStorage();
+  vi.stubGlobal("localStorage", storage);
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: storage,
+  });
   localStorage.clear();
   vi.stubGlobal(
     "matchMedia",
@@ -116,6 +143,11 @@ beforeEach(() => {
       dispatchEvent: vi.fn(),
     })),
   );
+});
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
 });
 
 describe("search clear behavior", () => {
