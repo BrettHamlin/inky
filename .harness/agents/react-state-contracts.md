@@ -38,6 +38,13 @@ drift, persistence regressions, validation gaps, or filtering/search behavior
 changes, remain in scope at warning/error severity when the reviewed diff
 supports them.
 
+Do not lower the overall grade to C/D/F for helper behavior uncertainty when
+the reviewed cluster calls a helper whose definition is outside the provided
+diff/context and the local call site does not contradict the expected contract.
+Report that boundary as info/advisory if useful. Grade C/D/F only when the
+reviewed diff, adjacent context, or build/test evidence shows a concrete state
+contract break.
+
 ## What to check
 
 - New UI state has a clear contract: initial value, update path, persistence
